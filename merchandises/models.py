@@ -9,9 +9,9 @@ class Merchandise(TimeModel):
     author = models.ForeignKey(
         User, related_name="merchandises", on_delete=models.SET_NULL, null=True
     )
-    released_at = models.DateTimeField(null=True, default=None)
+    released_at = models.DateTimeField(null=True,blank=True, default=None)
     is_reviewed = models.BooleanField(default=False)
-    commission_rate = models.DecimalField(max_digits=5, decimal_places=2)
+    commission_rate = models.DecimalField(max_digits=5, decimal_places=2,null=True, blank=True)
 
 
 class MerchContent(TimeModel):
