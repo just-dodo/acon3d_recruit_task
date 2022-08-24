@@ -1,3 +1,9 @@
-from django.shortcuts import render
+from .models import Merchandise, MerchContent
+from rest_framework import viewsets
 
-# Create your views here.
+from .serializers import MerchandiseSerializer 
+
+
+class MerchandiseViewSet(viewsets.ModelViewSet):
+    serializer_class = MerchandiseSerializer
+    queryset = Merchandise.objects.all()
