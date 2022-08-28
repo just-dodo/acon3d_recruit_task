@@ -10,9 +10,11 @@ class Merchandise(TimeModel):
         User, related_name="merchandises", on_delete=models.SET_NULL, null=True
     )
     released_at = models.DateTimeField(null=True,blank=True, default=None)
+    is_submitted = models.BooleanField(default=False)
     is_reviewed = models.BooleanField(default=False)
     commission_rate = models.DecimalField(max_digits=5, decimal_places=2,null=True, blank=True)
-
+    #TODO
+    #image, file
 
 class MerchContent(TimeModel):
     merchendise = models.ForeignKey(

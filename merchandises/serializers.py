@@ -11,7 +11,7 @@ class MerchandiseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Merchandise
         fields = (
-            "name", "author", "released_at",
+            "name", "author", "released_at", "is_submitted",
             "is_reviewed", "commission_rate", "contents")
 
     def get_author(self, merchendise):
