@@ -1,9 +1,9 @@
 from django.contrib import admin
-from core.common_admin import TimeModelAdmin, TimeModelInline
+from core.common_admin import TimeModelAdmin, TimeModelStackedInline
 from .models import Merchandise, MerchContent
 
 
-class MerchContentInline(TimeModelInline):
+class MerchContentInline(TimeModelStackedInline):
     model = MerchContent
     fields = (
         "language",

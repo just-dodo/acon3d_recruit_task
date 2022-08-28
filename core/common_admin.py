@@ -12,7 +12,14 @@ class TimeModelAdmin(admin.ModelAdmin):
         "deleted_at",
     )
 
-class TimeModelInline(admin.TabularInline):
+class TimeModelTabularInline(admin.TabularInline):
+    extra = 0
+    readonly_fields = (
+        "created_at",
+        "updated_at",
+        "deleted_at",
+    )
+class TimeModelStackedInline(admin.StackedInline):
     extra = 0
     readonly_fields = (
         "created_at",
