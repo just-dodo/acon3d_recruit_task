@@ -5,7 +5,6 @@ from rest_framework import serializers
 
 class AbstractUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
-    email = serializers.CharField(allow_null=True)
 
     class Meta:
         model = User
@@ -20,6 +19,8 @@ class AbstractUserSerializer(serializers.ModelSerializer):
 
 class UserSerializer(AbstractUserSerializer):
     group = serializers.SerializerMethodField()
+    password = serializers.CharField(write_only=True)
+    email = serializers.CharField(required=True)
 
     class Meta:
         model = User
