@@ -18,11 +18,6 @@ def main():
     execute_from_command_line(sys.argv)
 
     command = sys.argv[1]
-    if command == "migrate":
-
-        from core.utils.post_migration import post_migration
-
-        post_migration()
 
 
 if __name__ == "__main__":
