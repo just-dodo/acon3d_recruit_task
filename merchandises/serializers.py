@@ -4,38 +4,50 @@ from .models import Merchandise, MerchContent
 from rest_framework import serializers
 
 
+class ContentsField(serializers.Field):
+    def get_attribute(self, merchendise):
+        contents_queryset = []
+        print(merchendise)
+        if hasattr(merchendise, 'merchandise_contents'):
+            contents_queryset = merchendise.merchandise_contents
+        elif merchendise.contents.exists():
+            contents_queryset = merchendise.contents
+        return contents_queryset
+
+    def to_representation(self, value):
+        return MerchContentSerializer(value, many=True).data
+
+    def to_internal_value(self, data):
+        content_serializer = MerchContentSerializer(data=data, many=True)
+        content_serializer.is_valid(raise_exception=True)
+        
+        return content_serializer.data
+
 class MerchandiseSerializer(serializers.ModelSerializer):
     author = serializers.SerializerMethodField(allow_null=True)
-    contents = serializers.SerializerMethodField(allow_null=True)
+    contents = ContentsField()
 
     class Meta:
         model = Merchandise
-        fields = (
-            "name", "author", "released_at", "is_submitted",
-            "is_reviewed", "commission_rate", "contents")
+        fields = '__all__'
 
     def get_author(self, merchendise):
         return AbstractUserSerializer(merchendise.author).data
 
-    def get_contents(self, merchendise):
-        if hasattr(merchendise, 'merchandise_contents'):
-            return MerchContentSerializer(merchendise.merchandise_contents, many=True).data
-        else:
-            return []
+    def save(self, **kwargs):
 
-    def create(self, validated_data):
+        contents = self.validated_data.pop('contents')
 
-        merchandise = super().create(validated_data=validated_data)
-        author = validated_data.get("author", "")
+        merchandise = super().save(**kwargs)
 
-        if author:
-            merchandise.author = author
-            merchandise.save()
+        content_serializer = MerchContentSerializer(data=contents, many=True)
+        content_serializer.is_valid(raise_exception=True)
+        content_serializer.save(merchendise=merchandise)
+
         return merchandise
 
 
 class MerchContentSerializer(serializers.ModelSerializer):
-    merchandise = serializers.CharField(write_only=True)
 
     class Meta:
         model = MerchContent
