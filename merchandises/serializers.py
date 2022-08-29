@@ -32,6 +32,28 @@ class MerchandiseSerializer(serializers.ModelSerializer):
     def get_author(self, merchandise):
         return AbstractUserSerializer(merchandise.author).data
 
+    def validate_is_submitted(self, value):
+        user = self.context["request"].user
+        if self.instance:
+            if self.instance.author != user:
+                raise serializers.ValidationError("Not allowed to change is_submitted")
+        return value
+
+    def validate_is_reviewed(self, value):
+        return self.is_editor(value)
+
+    def validate_commission_rate(self, value):
+        return self.is_editor(value)
+
+    def is_editor(self, value):
+        user = self.context["request"].user
+        if not user.groups.filter(name="Editors").exists():
+            raise serializers.ValidationError(
+                "Only editors are allowed to change this value."
+            )
+
+        return value
+
     def save(self, **kwargs):
 
         contents_data = self.validated_data.pop("contents")
