@@ -14,7 +14,7 @@ class ContentsField(serializers.Field):
         return contents_queryset
 
     def to_representation(self, value):
-        
+
         return MerchContentSerializer(value, many=True).data
 
     def to_internal_value(self, data):
@@ -41,10 +41,16 @@ class MerchandiseSerializer(serializers.ModelSerializer):
             # content_data = dict(content_data)
             # print(content_data)
             language = content_data.get("language")
-            content, created = MerchContent.objects.get_or_create(
+
+            if MerchContent.objects.filter(
                 merchandise=merchandise, language=language
+            ).exists():
+                content = MerchContent.objects.get(
+                    merchandise=merchandise, language=language
                 )
-                content_serializer = MerchContentSerializer(content, data=content_data, partial=True)
+                content_serializer = MerchContentSerializer(
+                    content, data=content_data, partial=True
+                )
             else:
                 content_serializer = MerchContentSerializer(data=content_data)
             content_serializer.is_valid(raise_exception=True)
