@@ -9,12 +9,15 @@ class Merchandise(TimeModel):
     author = models.ForeignKey(
         User, related_name="merchandises", on_delete=models.SET_NULL, null=True
     )
-    released_at = models.DateTimeField(null=True,blank=True, default=None)
+    released_at = models.DateTimeField(null=True, blank=True, default=None)
     is_submitted = models.BooleanField(default=False)
     is_reviewed = models.BooleanField(default=False)
-    commission_rate = models.DecimalField(max_digits=5, decimal_places=2,null=True, blank=True)
-    #TODO
-    #image, file
+    commission_rate = models.DecimalField(
+        max_digits=5, decimal_places=2, null=True, blank=True
+    )
+    # TODO
+    # image, file
+
 
 class MerchContent(TimeModel):
     merchendise = models.ForeignKey(
@@ -33,3 +36,10 @@ class MerchContent(TimeModel):
     title = models.CharField(max_length=100)
     body = models.TextField(max_length=10000, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["merchendise", "language"], name="unique_content_for_each_lang"
+            )
+        ]

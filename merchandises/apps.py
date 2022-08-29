@@ -33,7 +33,6 @@ def set_group_permission():
     add_permissions = merch_permissions.filter(
         Q(codename__startswith="add") | Q(codename__startswith="change"))
 
-    print(add_permissions)
     authors_group.permissions.set(list(add_permissions))
 
     editors_group.permissions.set(list(merch_permissions))

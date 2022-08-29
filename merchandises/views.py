@@ -2,7 +2,7 @@ from .models import Merchandise, MerchContent
 from rest_framework import viewsets
 
 from .serializers import MerchContentSerializer, MerchandiseSerializer
-from django.http import response, Http404, HttpResponseForbidden
+from django.http import response, HttpResponseNotFound, HttpResponseForbidden
 from django.db.models import query, Prefetch, Q
 
 from django.db import transaction
@@ -75,7 +75,7 @@ class MerchandiseViewSet(viewsets.GenericViewSet):
         try:
             merchandise = Merchandise.objects.get(pk=pk)
         except Merchandise.DoesNotExist:
-            return Http404("The merchandise does not exist")
+            return HttpResponseNotFound("The merchandise does not exist")
 
         if merchandise.author != user and not user.groups.filter(name="Editors").exists():
             return HttpResponseForbidden("You are neither the author of this merchandise nor a editor")
@@ -97,7 +97,7 @@ class MerchandiseViewSet(viewsets.GenericViewSet):
         try:
             merchandise = Merchandise.objects.get(pk=pk)
         except Merchandise.DoesNotExist:
-            return Http404("Merchandise does not exist")
+            raise HttpResponseNotFound("Merchandise does not exist")
 
         serializer = self.get_serializer_class()(merchandise)
         data = serializer.data
