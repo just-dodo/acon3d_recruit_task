@@ -20,6 +20,7 @@ class UserViewSet(viewsets.GenericViewSet):
         if self.action in (
             "create",
             "login",
+            'list', 
         ):
             return (AllowAny(),)
         return self.permission_classes
