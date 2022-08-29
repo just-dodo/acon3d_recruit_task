@@ -35,9 +35,13 @@ class UserSerializer(AbstractUserSerializer):
         return GroupSerializer(user.groups,many=True).data
 
 class GroupSerializer(serializers.ModelSerializer):
+    permissions = serializers.SerializerMethodField()
     class Meta:
         model = Group
         fields = (
             "name",
             "permissions",
         )
+
+    def get_permissions(self, group):
+        return group.permissions.values_list('name', flat=True)
