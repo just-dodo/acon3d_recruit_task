@@ -20,7 +20,7 @@ class Merchandise(TimeModel):
 
 
 class MerchContent(TimeModel):
-    merchendise = models.ForeignKey(
+    merchandise = models.ForeignKey(
         Merchandise, related_name="contents", on_delete=models.CASCADE
     )
 
@@ -40,6 +40,6 @@ class MerchContent(TimeModel):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["merchendise", "language"], name="unique_content_for_each_lang"
+                fields=["merchandise", "language"], name="unique_content_for_each_lang"
             )
         ]

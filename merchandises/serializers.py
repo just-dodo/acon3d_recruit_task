@@ -1,26 +1,24 @@
+from functools import partial
 from users.serializers import AbstractUserSerializer
 from .models import Merchandise, MerchContent
 from rest_framework import serializers
 
 
 class ContentsField(serializers.Field):
-    def get_attribute(self, merchendise):
+    def get_attribute(self, merchandise):
         contents_queryset = []
-        print(merchendise)
-        if hasattr(merchendise, "merchandise_contents"):
-            contents_queryset = merchendise.merchandise_contents
-        elif merchendise.contents.exists():
-            contents_queryset = merchendise.contents
+        if hasattr(merchandise, "merchandise_contents"):
+            contents_queryset = merchandise.merchandise_contents
+        elif merchandise.contents.exists():
+            contents_queryset = merchandise.contents
         return contents_queryset
 
     def to_representation(self, value):
+        
         return MerchContentSerializer(value, many=True).data
 
     def to_internal_value(self, data):
-        content_serializer = MerchContentSerializer(data=data, many=True)
-        content_serializer.is_valid(raise_exception=True)
-
-        return content_serializer.data
+        return data
 
 
 class MerchandiseSerializer(serializers.ModelSerializer):
@@ -31,13 +29,12 @@ class MerchandiseSerializer(serializers.ModelSerializer):
         model = Merchandise
         fields = "__all__"
 
-    def get_author(self, merchendise):
-        return AbstractUserSerializer(merchendise.author).data
+    def get_author(self, merchandise):
+        return AbstractUserSerializer(merchandise.author).data
 
     def save(self, **kwargs):
 
         contents_data = self.validated_data.pop("contents")
-        print(contents_data)
         merchandise = super().save(**kwargs)
 
         for content_data in contents_data:
@@ -45,12 +42,13 @@ class MerchandiseSerializer(serializers.ModelSerializer):
             # print(content_data)
             language = content_data.get("language")
             content, created = MerchContent.objects.get_or_create(
-                merchendise=merchandise, language=language
-            )
-
-            content_serializer = MerchContentSerializer(content, data=content_data)
+                merchandise=merchandise, language=language
+                )
+                content_serializer = MerchContentSerializer(content, data=content_data, partial=True)
+            else:
+                content_serializer = MerchContentSerializer(data=content_data)
             content_serializer.is_valid(raise_exception=True)
-            content_serializer.save(merchendise=merchandise)
+            content_serializer.save(merchandise=merchandise)
 
         return merchandise
 
