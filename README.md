@@ -3,7 +3,7 @@
 ## You can check...
 - Model diagram in [Figma](https://www.figma.com/file/JeTtd3MHTQGmkWn3SguUlP/ACON-task-Architecture?node-id=0%3A1)
 - Directly run the server application (below)
-- There is small changes after submit. The changes are in [`after-submit`](https://github.com/just-dodo/acon3d_recruit_task/tree/after-submit) branch. You can merge PR https://github.com/just-dodo/acon3d_recruit_task/pull/12 before check
+- There are small changes after submit. The changes are in [`after-submit`](https://github.com/just-dodo/acon3d_recruit_task/tree/after-submit) branch. You can merge PR https://github.com/just-dodo/acon3d_recruit_task/pull/12 before check
 
 ## How to start
 1. `docker-compose up --build`
