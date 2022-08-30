@@ -6,7 +6,7 @@
 - There are small changes after submit. The changes are in [`after-submit`](https://github.com/just-dodo/acon3d_recruit_task/tree/after-submit) branch. You can merge PR https://github.com/just-dodo/acon3d_recruit_task/pull/12 before check
 
 ## How to start
-1. `docker-compose up --build`
+1. `(sudo) docker-compose up --build`
 2. try api to `localhost:8000` or `127.0.0.1:8000`
 3. API docs is [here](https://dodo4114.notion.site/API-ef2e45a579a249a39eda8102fe5372c1)
 
