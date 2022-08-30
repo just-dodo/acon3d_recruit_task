@@ -7,3 +7,4 @@ COPY requirements.txt /code/
 RUN pip3 install -r requirements.txt
 COPY . /code/
 RUN python3 manage.py migrate
+RUN python3 manage.py createsuperuser --noinput
