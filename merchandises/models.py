@@ -43,3 +43,30 @@ class MerchContent(TimeModel):
                 fields=["merchandise", "language"], name="unique_content_for_each_lang"
             )
         ]
+
+
+class Purchase(TimeModel):
+    merchandise = models.ForeignKey(
+        Merchandise, related_name="purchased_list", on_delete=models.SET_NULL, null=True
+    )
+    user = models.ForeignKey(
+        User, related_name="purchase_list", on_delete=models.SET_NULL, null=True
+    )
+    LanguageChoices = (
+        ("ko", "Korean"),
+        ("en", "English"),
+        ("zh", "Chinese"),
+    )
+    language = models.CharField(
+        max_length=10, choices=LanguageChoices, default="Korean"
+    )
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["merchandise", "user"], name="unique_purchase_for_same_merchandise"
+            )
+        ]
+
+    

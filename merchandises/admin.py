@@ -1,6 +1,10 @@
 from django.contrib import admin
-from core.common_admin import TimeModelAdmin, TimeModelStackedInline
-from .models import Merchandise, MerchContent
+from core.common_admin import (
+    TimeModelAdmin,
+    TimeModelTabularInline,
+    TimeModelStackedInline,
+)
+from .models import Merchandise, MerchContent, Purchase
 
 
 class MerchContentInline(TimeModelStackedInline):
@@ -13,11 +17,26 @@ class MerchContentInline(TimeModelStackedInline):
     )
 
 
+class PurchaseInline(TimeModelTabularInline):
+    model = Purchase
+    fields = (
+        "user",
+        "language",
+        "price",
+    )
+
+
 @admin.register(Merchandise)
 class MerchandiseAdmin(TimeModelAdmin):
-    inlines = [MerchContentInline]
+    inlines = [MerchContentInline, PurchaseInline]
+    pass
 
 
 @admin.register(MerchContent)
 class MerchContentAdmin(TimeModelAdmin):
+    pass
+
+
+@admin.register(Purchase)
+class PurchaseAdmin(TimeModelAdmin):
     pass

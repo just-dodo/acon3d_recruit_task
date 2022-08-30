@@ -1,14 +1,15 @@
 from .models import Merchandise, MerchContent
 from rest_framework import viewsets
 
-from .serializers import MerchContentSerializer, MerchandiseSerializer
-from django.http import response, HttpResponseNotFound, HttpResponseForbidden
+from .serializers import MerchContentSerializer, MerchandiseSerializer, PurchaseSerializer
+from django.http import response, HttpResponseNotFound, HttpResponseForbidden, HttpResponseBadRequest
 from django.db.models import query, Prefetch, Q
 
 from django.db import transaction
 
 from rest_framework.permissions import AllowAny, IsAuthenticated, DjangoModelPermissionsOrAnonReadOnly
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
 
 class MerchandiseViewSet(viewsets.GenericViewSet):
@@ -108,3 +109,30 @@ class MerchandiseViewSet(viewsets.GenericViewSet):
         serializer = self.get_serializer_class()(queryset, many=True)
         data = serializer.data
         return Response(data)
+
+
+    @action(detail=True, methods=["POST"])
+    def purchase(self, request, pk):
+        user = request.user
+        queryset = self.get_queryset()
+
+        try:
+            print(pk)
+            merchandise = queryset.get(pk=pk)
+        except Merchandise.DoesNotExist:
+            return HttpResponseNotFound("The merchandise does not exist")
+
+        if merchandise.author == user :
+            return HttpResponseBadRequest("You cannot buy your merchandise for yourself.")
+        
+
+        serialize_data = {
+            'merchandise' : merchandise.id,
+            'user' : user.id,
+        }
+
+        serializer = PurchaseSerializer(data=serialize_data,partial=True, context={'request':request,'merchandise':merchandise})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        
+        return Response(serializer.data)

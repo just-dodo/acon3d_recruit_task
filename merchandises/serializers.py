@@ -1,7 +1,10 @@
 from functools import partial
 from users.serializers import AbstractUserSerializer
-from .models import Merchandise, MerchContent
+from .models import Merchandise, MerchContent, Purchase
 from rest_framework import serializers
+from django.db.utils import IntegrityError
+from django.http import HttpResponseBadRequest
+from rest_framework.fields import empty
 
 
 class ContentsField(serializers.Field):
@@ -90,3 +93,34 @@ class MerchContentSerializer(serializers.ModelSerializer):
             "body",
             "price",
         )
+
+
+class PurchaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Purchase
+        fields = "__all__"
+
+    def validate_user(self, user):
+        user = self.context["request"].user
+        if not user.is_authenticated:
+            raise serializers.ValidationError("User is not authenticated")
+        return user
+
+    def create(self, validated_data, **kwargs):
+        try:
+            return super().create(validated_data, **kwargs)
+        except IntegrityError:
+            raise serializers.ValidationError("You already have bought it.")
+
+    def __init__(self, instance=None, data=empty, *args, **kwargs):
+
+        merchandise = kwargs["context"]["merchandise"]
+        merchandise_content = merchandise.merchandise_contents[0]
+        merchandise_content_data = MerchContentSerializer(merchandise_content).data
+
+        if data is not empty:
+            data.update(merchandise_content_data)
+        else:
+            data = merchandise_content_data
+
+        super().__init__(instance=instance, data=data, *args, **kwargs)
