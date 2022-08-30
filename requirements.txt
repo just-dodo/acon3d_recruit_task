@@ -1,7 +1,8 @@
-Django>=3.0,<4.0
+Django>=4.0
 psycopg2>=2.8
 envparse
 python-dotenv
 djangorestframework
 markdown
 django-filter
+coverage
