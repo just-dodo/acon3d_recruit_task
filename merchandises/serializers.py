@@ -124,3 +124,37 @@ class PurchaseSerializer(serializers.ModelSerializer):
             data = merchandise_content_data
 
         super().__init__(instance=instance, data=data, *args, **kwargs)
+
+
+class MerchFilterSerializer(serializers.Serializer):
+    class Meta:
+        fields = ("author", "released_at", "is_submitted", "is_reviewed")
+
+    def validate_is_reviewed(self, value):
+        user = self.context["request"].user
+        if user.is_anonymous or not user.groups.filter(name="Editors").exists():
+            return True
+        else:
+            return False
+
+    def validate_user(self, user):
+        user = self.context["request"].user
+        if not user.is_authenticated:
+            raise serializers.ValidationError("User is not authenticated")
+        return user
+class MerchContentFilterSerializer(serializers.Serializer):
+    class Meta:
+        fields = ("title", "language", "body", "price")
+
+    def validate_is_reviewed(self, value):
+        user = self.context["request"].user
+        if user.is_anonymous or not user.groups.filter(name="Editors").exists():
+            return True
+        else:
+            return False
+
+    def validate_user(self, user):
+        user = self.context["request"].user
+        if not user.is_authenticated:
+            raise serializers.ValidationError("User is not authenticated")
+        return user

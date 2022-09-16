@@ -5,6 +5,8 @@ from .serializers import (
     MerchContentSerializer,
     MerchandiseSerializer,
     PurchaseSerializer,
+    MerchFilterSerializer,
+    MerchContentFilterSerializer
 )
 from django.http import (
     response,
@@ -23,11 +25,14 @@ from rest_framework.permissions import (
 )
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class MerchandiseViewSet(viewsets.GenericViewSet):
     serializer_class = MerchandiseSerializer
     queryset = Merchandise.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['category', 'in_stock']
 
     def get_permissions(self):
         permission_list = ()
@@ -37,28 +42,31 @@ class MerchandiseViewSet(viewsets.GenericViewSet):
 
     def get_queryset(self):
 
-        merch_kwargs = {}
-        if (
-            self.request.user.is_anonymous
-            or not self.request.user.groups.filter(name="Editors").exists()
-        ):
-            merch_kwargs["is_reviewed"] = True
-
         query_params = self.request.query_params.dict()
-        contents_kwargs = {}
-        language = query_params.pop("language", "")
 
-        if language:
-            contents_kwargs["language"] = language
-        merch_kwargs.update(query_params)
+        # Query params to Merchandise filter kwargs
+        merch_filter_serializer = MerchFilterSerializer(
+            data=query_params, partial=True, constext={"request": self.request}
+        )
+        merch_filter_serializer.is_valid(raise_exception=True)
+        merch_filter_kwargs = merch_filter_serializer.data
+        merch_filter_kwargs = {}
+
+        # Query params to MerchContent filter kwargs
+        merch_content_filter_serializer = MerchContentFilterSerializer(
+            data=query_params, partial=True, constext={"request": self.request}
+        )
+        merch_content_filter_serializer.is_valid(raise_exception=True)
+        merch_content_filter_kwargs = merch_content_filter_serializer.data
+        merch_content_filter_kwargs = {}
 
         queryset = Merchandise.objects.filter(
-            deleted_at__isnull=True, **merch_kwargs
+            deleted_at__isnull=True, **merch_filter_kwargs
         ).prefetch_related(
             Prefetch(
                 "contents",
                 queryset=MerchContent.objects.filter(
-                    deleted_at__isnull=True, **contents_kwargs
+                    deleted_at__isnull=True, **merch_content_filter_kwargs
                 ),
                 to_attr="merchandise_contents",
             )
