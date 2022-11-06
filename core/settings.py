@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'merchandises.apps.MerchandisesConfig',
     'rest_framework',
     "rest_framework.authtoken",
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -77,6 +78,10 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissions'
+    ],
+    
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend'
     ]
 }
 
